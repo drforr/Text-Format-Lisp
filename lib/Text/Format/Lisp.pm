@@ -17,15 +17,25 @@ our $VERSION = qv('0.0.3');
 sub Format
   {
   my ( $fh, $format, @params ) = @_;
-  if ( $format eq q{~`} )
-    {
-    Carp::croak q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)};
-    }
-  if ( $format eq q{~!} )
-    {
-    Carp::croak q{error in FORMAT: unknown format directive (character: EXCLAMATION_MARK)};
-    }
-  if ( $format eq q{~$} )
+  Carp::croak q{error in FORMAT: no corresponding open paren} if
+    $format eq q{~)};
+  Carp::croak q{error in FORMAT: no corresponding close paren} if
+    $format eq q{~(};
+
+  Carp::croak q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)} if
+    $format eq q{~`};
+  Carp::croak q{error in FORMAT: unknown format directive (character: FULL_STOP)} if
+    $format eq q{~.};
+  Carp::croak q{error in FORMAT: unknown format directive (character: EQUALS_SIGN)} if
+    $format eq q{~=};
+  Carp::croak q{error in FORMAT: unknown format directive (character: LATIN_CAPITAL_LETTER_Q)} if
+    $format eq q{~Q};
+  Carp::croak q{error in FORMAT: unknown format directive (character: EXCLAMATION_MARK)} if
+    $format eq q{~!};
+  if ( $format eq q{~$} or
+       $format eq q{~W} or
+       $format eq q{~E} or
+       $format eq q{~*} )
     {
     Carp::croak q{error in FORMAT: no more arguments};
     }
@@ -35,7 +45,10 @@ sub Format
     }
   if ( $format eq q{~} or
        $format eq q{~@} or
-       $format eq q{~#} )
+       $format eq q{~#} or
+       $format eq q{~-} or
+       $format eq q{~+} or
+       $format =~ m{~[0-9]} )
     {
     Carp::croak q{error in FORMAT: string ended before directive was found};
     }
