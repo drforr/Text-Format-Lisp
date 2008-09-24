@@ -3,13 +3,53 @@ package Text::Format::Lisp;
 use warnings;
 use strict;
 use Carp;
+use base qw( Exporter );
+
+our @EXPORT_OK = qw( Format );
 
 use version;
-$VERSION = qv('0.0.3');
+our $VERSION = qv('0.0.3');
 
+=head2 Format($fh,$format,@params)
 
-# Module implementation here
+=cut
 
+sub Format
+  {
+  my ( $fh, $format, @params ) = @_;
+  if ( $format eq q{~`} )
+    {
+    Carp::croak q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)};
+    }
+  if ( $format eq q{~!} )
+    {
+    Carp::croak q{error in FORMAT: unknown format directive (character: EXCLAMATION_MARK)};
+    }
+  if ( $format eq q{~$} )
+    {
+    Carp::croak q{error in FORMAT: no more arguments};
+    }
+  if ( $format eq q{~ } )
+    {
+    Carp::croak q{error in FORMAT: unknown format directive (character: Space)};
+    }
+  if ( $format eq q{~} or
+       $format eq q{~@} or
+       $format eq q{~#} )
+    {
+    Carp::croak q{error in FORMAT: string ended before directive was found};
+    }
+  
+  my $output = undef;
+#  $output = $format;
+if ( $format ) { $output = '~' }
+else { $output = q{} }
+  if ( $fh )
+    {
+    print $fh $output;
+    }
+  return $output;
+  }
 
 1; # Magic true value required at end of module
 __END__
