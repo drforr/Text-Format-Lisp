@@ -3,6 +3,7 @@ package Text::Format::Lisp;
 use warnings;
 use strict;
 use Carp;
+use Scalar::Util qw(looks_like_number);
 use base qw( Exporter );
 
 our @EXPORT_OK = qw( Format );
@@ -42,11 +43,26 @@ sub Format
         {
         $in_tilde = undef;
         Carp::croak q{error in FORMAT: no more arguments} unless @args;
-        $output .= sprintf q{%.2f}, shift @args;
+        my $arg = shift @args;
+        if ( defined $arg )
+          {
+          if ( looks_like_number($arg) )
+            {
+            $output .= sprintf q{%.2f}, $arg;
+            }
+          else
+            {
+            $output .= $arg;
+            }
+          }
+        else
+          {
+          $output .= q{NIL};
+          }
         }
       else
         {
-        $output .= q{~};
+        $output .= q{$};
         }
       }
     };
