@@ -20,19 +20,39 @@ random fun extensions.
 sub Format
   {
   my ( $fh, $format, @params ) = @_;
-  Carp::croak q{error in FORMAT: no corresponding open paren} if
-    $format eq q{~)};
   Carp::croak q{error in FORMAT: no corresponding close paren} if
+    $format eq q{~)};
+  Carp::croak q{error in FORMAT: no corresponding open paren} if
     $format eq q{~(};
+  Carp::croak q{error in FORMAT: no corresponding close bracket} if
+    $format eq q{~>};
+  Carp::croak q{error in FORMAT: no corresponding open bracket} if
+    $format eq q{~<};
+  Carp::croak q{error in FORMAT: no corresponding close brace} if
+    $format eq q(~});
+  Carp::croak q{error in FORMAT: no corresponding open brace} if
+    $format eq q(~{);
   Carp::croak q{error in FORMAT: no matching closing slash} if
     $format eq q{~/};
 
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: Nul)} if
+    $format eq qq{~\x00};
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: Soh)} if
+    $format eq qq{~\x01};
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: Stx)} if
+    $format eq qq{~\x02};
   Carp::croak
     q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)} if
     $format eq q{~`};
   Carp::croak
     q{error in FORMAT: unknown format directive (character: FULL_STOP)} if
     $format eq q{~.};
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: QUOTATION_MARK)} if
+    $format eq q{~"};
   Carp::croak
     q{error in FORMAT: unknown format directive (character: EQUALS_SIGN)} if
     $format eq q{~=};
@@ -50,8 +70,11 @@ sub Format
   if ( $format eq q{~} or
        $format eq q{~@} or
        $format eq q{~#} or
+       $format eq q{~'} or
+       $format eq q{~,} or
        $format eq q{~-} or
        $format eq q{~+} or
+       $format eq q{~:} or
        $format =~ m{~[0-9]} )
     {
     Carp::croak q{error in FORMAT: string ended before directive was found};
