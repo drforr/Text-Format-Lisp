@@ -6,7 +6,7 @@ README
 lib/Text/Format/Lisp.pm
 t/00.load.t
 t/01.basic.t
-t/02.tilde.t
+t/02.dollar.t
 t/perlcritic.t
 t/pod-coverage.t
 t/pod.t

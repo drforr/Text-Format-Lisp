@@ -19,7 +19,45 @@ random fun extensions.
 
 sub Format
   {
-  my ( $fh, $format, @params ) = @_;
+  my ( $fh, $format, @args ) = @_;
+  my $output = undef;
+  my $in_tilde = undef;
+  my $action =
+    {
+    q{~} => sub
+      {
+      if ( $in_tilde )
+        {
+        $output .= q{~};
+        $in_tilde = undef;
+        }
+      else
+        {
+        $in_tilde = 1;
+        }
+      },
+    q{$} => sub
+      {
+      if ( $in_tilde )
+        {
+        $in_tilde = undef;
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        $output .= sprintf q{%.2f}, shift @args;
+        }
+      else
+        {
+        $output .= q{~};
+        }
+      }
+    };
+
+  for my $c ( split //, $format )
+    {
+    $action->{$c}->() if defined $action->{$c};
+    }
+
+  return $output if $output;
+
   Carp::croak q{error in FORMAT: no corresponding close paren} if
     $format eq q{~)};
   Carp::croak q{error in FORMAT: no corresponding open paren} if
@@ -63,7 +101,6 @@ sub Format
   Carp::croak q{error in FORMAT: unknown format directive (character: Space)} if
     $format eq q{~ };
   Carp::croak q{error in FORMAT: no more arguments} if
-    $format eq q{~$} or
     $format eq q{~W} or
     $format eq q{~E} or
     $format eq q{~*};
@@ -80,7 +117,7 @@ sub Format
     Carp::croak q{error in FORMAT: string ended before directive was found};
     }
   
-  my $output = undef;
+  $output = undef;
 #  $output = $format;
 if ( $format ) { $output = '~' }
 else { $output = q{} }
