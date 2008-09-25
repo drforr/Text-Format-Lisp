@@ -12,6 +12,9 @@ our $VERSION = qv('0.0.3');
 
 =head2 Format($fh,$format,@params)
 
+Does the nearest Perl equivalent of Lisp's (format) function. Along with some
+random fun extensions.
+
 =cut
 
 sub Format
@@ -21,28 +24,29 @@ sub Format
     $format eq q{~)};
   Carp::croak q{error in FORMAT: no corresponding close paren} if
     $format eq q{~(};
+  Carp::croak q{error in FORMAT: no matching closing slash} if
+    $format eq q{~/};
 
-  Carp::croak q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)} if
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: GRAVE_ACCENT)} if
     $format eq q{~`};
-  Carp::croak q{error in FORMAT: unknown format directive (character: FULL_STOP)} if
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: FULL_STOP)} if
     $format eq q{~.};
-  Carp::croak q{error in FORMAT: unknown format directive (character: EQUALS_SIGN)} if
+  Carp::croak
+    q{error in FORMAT: unknown format directive (character: EQUALS_SIGN)} if
     $format eq q{~=};
   Carp::croak q{error in FORMAT: unknown format directive (character: LATIN_CAPITAL_LETTER_Q)} if
     $format eq q{~Q};
   Carp::croak q{error in FORMAT: unknown format directive (character: EXCLAMATION_MARK)} if
     $format eq q{~!};
-  if ( $format eq q{~$} or
-       $format eq q{~W} or
-       $format eq q{~E} or
-       $format eq q{~*} )
-    {
-    Carp::croak q{error in FORMAT: no more arguments};
-    }
-  if ( $format eq q{~ } )
-    {
-    Carp::croak q{error in FORMAT: unknown format directive (character: Space)};
-    }
+  Carp::croak q{error in FORMAT: unknown format directive (character: Space)} if
+    $format eq q{~ };
+  Carp::croak q{error in FORMAT: no more arguments} if
+    $format eq q{~$} or
+    $format eq q{~W} or
+    $format eq q{~E} or
+    $format eq q{~*};
   if ( $format eq q{~} or
        $format eq q{~@} or
        $format eq q{~#} or
