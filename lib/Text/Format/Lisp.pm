@@ -63,8 +63,7 @@ sub Format
       if ( $state->{in_tilde} )
         {
         $state->{output} .= q{~};
-        $state->{in_tilde} = undef;
-        $state->{at_sign} = undef;
+        $state = undef;
         }
       else
         {
@@ -80,6 +79,17 @@ sub Format
       else
         {
         $state->{output} .= q{@};
+        }
+      },
+    q{:} => sub
+      {
+      if ( $state->{in_tilde} )
+        {
+        $state->{colon} = 1;
+        }
+      else
+        {
+        $state->{output} .= q{:};
         }
       },
     q{$} => sub
