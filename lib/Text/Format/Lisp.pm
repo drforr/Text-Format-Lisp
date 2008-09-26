@@ -21,101 +21,100 @@ random fun extensions.
 sub Format
   {
   my ( $fh, $format, @args ) = @_;
-  my $output = undef;
-  my $in_tilde = undef;
-  my $at_sign = undef;
+  my $state = {};
+
   my $action =
     {
     q{f} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
         Carp::croak q{error in FORMAT: no more arguments} unless @args;
         }
       else
         {
-        $output .= q{f};
+        $state->{output} .= q{f};
         }
       },
     q{o} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
         Carp::croak q{error in FORMAT: no more arguments} unless @args;
         }
       else
         {
-        $output .= q{o};
+        $state->{output} .= q{o};
         }
       },
     q{0} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
         Carp::croak q{error in FORMAT: string ended before directive was found};
         }
       else
         {
-        $output .= q{0};
+        $state->{output} .= q{0};
         }
       },
     q{~} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
-        $output .= q{~};
-        $in_tilde = undef;
-        $at_sign = undef;
+        $state->{output} .= q{~};
+        $state->{in_tilde} = undef;
+        $state->{at_sign} = undef;
         }
       else
         {
-        $in_tilde = 1;
+        $state->{in_tilde} = 1;
         }
       },
     q{@} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
-        $at_sign = 1;
+        $state->{at_sign} = 1;
         }
       else
         {
-        $output .= q{@};
+        $state->{output} .= q{@};
         }
       },
     q{$} => sub
       {
-      if ( $in_tilde )
+      if ( $state->{in_tilde} )
         {
-        $in_tilde = undef;
+        $state->{in_tilde} = undef;
         Carp::croak q{error in FORMAT: no more arguments} unless @args;
         my $arg = shift @args;
         if ( defined $arg )
           {
           if ( looks_like_number($arg) )
             {
-            if ( $at_sign )
+            if ( $state->{at_sign} )
               {
-              $output .= sprintf $arg >= 0 ? q{+%.2f} : q{%.2f}, $arg;
+              $state->{output} .= sprintf $arg >= 0 ? q{+%.2f} : q{%.2f}, $arg;
               }
             else 
               {
-              $output .= sprintf q{%.2f}, $arg;
+              $state->{output} .= sprintf q{%.2f}, $arg;
               }
             }
           else
             {
-            $output .= $arg;
+            $state->{output} .= $arg;
             }
           }
         else
           {
-          $output .= q{NIL};
+          $state->{output} .= q{NIL};
           }
         }
       else
         {
-        $output .= q{$};
+        $state->{output} .= q{$};
         }
       },
     };
@@ -125,7 +124,7 @@ sub Format
     $action->{$c}->() if defined $action->{$c};
     }
 
-  return $output if defined $output;
+  return $state->{output} if defined $state->{output};
 
   Carp::croak q{error in FORMAT: no corresponding close paren} if
     $format eq q{~)};
@@ -186,7 +185,7 @@ sub Format
     Carp::croak q{error in FORMAT: string ended before directive was found};
     }
   
-  $output = undef;
+  my $output = undef;
 #  $output = $format;
 if ( $format ) { $output = '~' }
 else { $output = q{} }
