@@ -23,19 +23,9 @@ sub Format
   my ( $fh, $format, @args ) = @_;
   my $output = undef;
   my $in_tilde = undef;
+  my $at_sign = undef;
   my $action =
     {
-    q{o} => sub
-      {
-      if ( $in_tilde )
-        {
-        Carp::croak q{error in FORMAT: no more arguments} unless @args;
-        }
-      else
-        {
-        $output .= q{o};
-        }
-      },
     q{f} => sub
       {
       if ( $in_tilde )
@@ -45,6 +35,17 @@ sub Format
       else
         {
         $output .= q{f};
+        }
+      },
+    q{o} => sub
+      {
+      if ( $in_tilde )
+        {
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        }
+      else
+        {
+        $output .= q{o};
         }
       },
     q{0} => sub
@@ -64,10 +65,22 @@ sub Format
         {
         $output .= q{~};
         $in_tilde = undef;
+        $at_sign = undef;
         }
       else
         {
         $in_tilde = 1;
+        }
+      },
+    q{@} => sub
+      {
+      if ( $in_tilde )
+        {
+        $at_sign = 1;
+        }
+      else
+        {
+        $output .= q{@};
         }
       },
     q{$} => sub
@@ -81,7 +94,14 @@ sub Format
           {
           if ( looks_like_number($arg) )
             {
-            $output .= sprintf q{%.2f}, $arg;
+            if ( $at_sign )
+              {
+              $output .= sprintf $arg >= 0 ? q{+%.2f} : q{%.2f}, $arg;
+              }
+            else 
+              {
+              $output .= sprintf q{%.2f}, $arg;
+              }
             }
           else
             {
@@ -97,7 +117,7 @@ sub Format
         {
         $output .= q{$};
         }
-      }
+      },
     };
 
   for my $c ( split //, $format )

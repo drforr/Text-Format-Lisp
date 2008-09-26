@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 BEGIN
   {
@@ -31,6 +31,31 @@ for ( my $i = 0; $i < @money; $i += 2 )
   my ( $value, $string ) = @money[$i,$i+1];
   my $format;
   eval { $format = Format( undef, q{~$}, $value ) };
+  unless ( $format eq $string and !$@ )
+    {
+    push @collected_failures, [ $value, $format, $@ ];
+    }
+  }
+#use YAML; die Dump(\@collected_failures);
+ok( !@collected_failures, q{format.dollar.4} );
+}
+
+{
+my @collected_failures;
+my @money =
+  (
+  1 => q{+1.00},
+  -1 => q{-1.00},
+  2.1 => q{+2.10},
+  30.25 => q{+30.25},
+  1.792 => q{+1.79},
+  -3.003 => q{-3.00},
+  );
+for ( my $i = 0; $i < @money; $i += 2 )
+  {
+  my ( $value, $string ) = @money[$i,$i+1];
+  my $format;
+  eval { $format = Format( undef, q{~@$}, $value ) };
   unless ( $format eq $string and !$@ )
     {
     push @collected_failures, [ $value, $format, $@ ];
