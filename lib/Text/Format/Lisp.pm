@@ -25,6 +25,39 @@ sub Format
   my $in_tilde = undef;
   my $action =
     {
+    q{o} => sub
+      {
+      if ( $in_tilde )
+        {
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        }
+      else
+        {
+        $output .= q{o};
+        }
+      },
+    q{f} => sub
+      {
+      if ( $in_tilde )
+        {
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        }
+      else
+        {
+        $output .= q{f};
+        }
+      },
+    q{0} => sub
+      {
+      if ( $in_tilde )
+        {
+        Carp::croak q{error in FORMAT: string ended before directive was found};
+        }
+      else
+        {
+        $output .= q{0};
+        }
+      },
     q{~} => sub
       {
       if ( $in_tilde )
@@ -72,7 +105,7 @@ sub Format
     $action->{$c}->() if defined $action->{$c};
     }
 
-  return $output if $output;
+  return $output if defined $output;
 
   Carp::croak q{error in FORMAT: no corresponding close paren} if
     $format eq q{~)};
