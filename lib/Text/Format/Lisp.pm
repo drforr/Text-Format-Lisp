@@ -3,7 +3,7 @@ package Text::Format::Lisp;
 use warnings;
 use strict;
 use Carp;
-use Scalar::Util qw(looks_like_number);
+use Scalar::Util qw( looks_like_number );
 use base qw( Exporter );
 
 our @EXPORT_OK = qw( Format );
@@ -145,9 +145,9 @@ sub Format
   Carp::croak q{error in FORMAT: no corresponding open bracket} if
     $format eq q{~<};
   Carp::croak q{error in FORMAT: no corresponding close brace} if
-    $format eq q(~});
+    $format eq qq(~\x7d);
   Carp::croak q{error in FORMAT: no corresponding open brace} if
-    $format eq q(~{);
+    $format eq qq(~\x7b);
   Carp::croak q{error in FORMAT: no matching closing slash} if
     $format eq q{~/};
 

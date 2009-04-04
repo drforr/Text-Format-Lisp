@@ -47,8 +47,8 @@ my @directives =
   q{(} => q{no corresponding open paren},
   q{>} => q{no corresponding close bracket},
   q{<} => q{no corresponding open bracket},
-  q(}) => q{no corresponding close brace},
-  q({) => q{no corresponding open brace},
+  qq(\x7d) => q{no corresponding close brace},
+  qq(\x7b) => q{no corresponding open brace},
   q{/} => q{no matching closing slash},
   );
 for ( my $i = 0; $i < @directives; $i += 2 )
