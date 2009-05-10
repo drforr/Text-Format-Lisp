@@ -25,6 +25,28 @@ sub Format
 
   my $action =
     {
+    q{A} => sub
+      {
+      if ( $state->{in_tilde} )
+        {
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        }
+      else
+        {
+        $state->{output} .= q{A};
+        }
+      },
+    q{B} => sub
+      {
+      if ( $state->{in_tilde} )
+        {
+        Carp::croak q{error in FORMAT: no more arguments} unless @args;
+        }
+      else
+        {
+        $state->{output} .= q{B};
+        }
+      },
     q{f} => sub
       {
       if ( $state->{in_tilde} )
@@ -52,6 +74,18 @@ sub Format
       if ( $state->{in_tilde} )
         {
         Carp::croak q{error in FORMAT: string ended before directive was found};
+        }
+      else
+        {
+        $state->{output} .= q{0};
+        }
+      },
+    q{4} => sub
+      {
+      if ( $state->{in_tilde} )
+        {
+#        Carp::croak q{error in FORMAT: string ended before directive was found};
+        $state->{argument} .= q{4};
         }
       else
         {
@@ -103,13 +137,18 @@ sub Format
           {
           if ( looks_like_number($arg) )
             {
+            my $format_len = 2;
+            if ( $state->{argument} )
+              {
+              $format_len = $state->{argument};
+              }
             if ( $state->{at_sign} )
               {
-              $state->{output} .= sprintf $arg >= 0 ? q{+%.2f} : q{%.2f}, $arg;
+              $state->{output} .= sprintf $arg >= 0 ? qq{+%.${format_len}f} : qq{%.${format_len}f}, $arg;
               }
             else 
               {
-              $state->{output} .= sprintf q{%.2f}, $arg;
+              $state->{output} .= sprintf qq{%.${format_len}f}, $arg;
               }
             }
           else
