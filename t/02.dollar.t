@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib $FindBin::Bin;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 BEGIN
   {
@@ -19,7 +19,7 @@ my %seen = ();
 
 sub _ok {
   my ( $test, $message ) = @_;
-  die "Message '$message' duplicated!\n" if $seen{$message}++ > 1;
+  die "Message '$message' duplicated!\n" if ++$seen{$message} > 1;
   return ok(@_);
 }
 
@@ -62,10 +62,27 @@ my @money =
   30.25 => q{30.25},
   1.792 => q{1.79},
   -3.003 => q{-3.00},
+  1234.0078 => q{1234.00},
   1234.5678 => q{1234.57},
   );
 #$DEBUG = 1;
 test_formats( q{~$}, \@money, q{format.dollar.6} );
+}
+
+{
+my @money =
+  (
+  1 => q{[1.00]},
+  -1 => q{[-1.00]},
+  2.1 => q{[2.10]},
+  30.25 => q{[30.25]},
+  1.792 => q{[1.79]},
+  -3.003 => q{[-3.00]},
+  1234.0078 => q{[1234.00]},
+  1234.5678 => q{[1234.57]},
+  );
+#$DEBUG = 1;
+test_formats( q{[~$]}, \@money, q{format.dollar.7} );
 }
 
 {
@@ -78,10 +95,11 @@ my @money =
   30.25 => q{+30.25},
   1.792 => q{+1.79},
   -3.003 => q{-3.00},
+  1234.0078 => q{+1234.00},
   1234.5678 => q{+1234.57},
   );
 #$DEBUG = 1;
-test_formats( q{~@$}, \@money, q{format.dollar.7} );
+test_formats( q{~@$}, \@money, q{format.dollar.8} );
 }
 
 {
@@ -93,10 +111,11 @@ my @money =
   30.25 => q{30.25},
   1.792 => q{1.79},
   -3.003 => q{-3.00},
+  1234.0078 => q{1234.00},
   1234.5678 => q{1234.57},
   );
 #$DEBUG = 1;
-test_formats( q{~:$}, \@money, q{format.dollar.8} );
+test_formats( q{~:$}, \@money, q{format.dollar.9} );
 }
 
 {
@@ -109,10 +128,11 @@ my @money =
   30.25 => q{+30.25},
   1.792 => q{+1.79},
   -3.003 => q{-3.00},
+  1234.0078 => q{+1234.00},
   1234.5678 => q{+1234.57},
   );
 #$DEBUG = 1;
-test_formats( q{~@:$}, \@money, q{format.dollar.9} );
+test_formats( q{~@:$}, \@money, q{format.dollar.10} );
 }
 
 {
@@ -125,10 +145,11 @@ my @money =
   30.25 => q{+30.25},
   1.792 => q{+1.79},
   -3.003 => q{-3.00},
+  1234.0078 => q{+1234.00},
   1234.5678 => q{+1234.57},
   );
 #$DEBUG = 1;
-test_formats( q{~:@$}, \@money, q{format.dollar.10} );
+test_formats( q{~:@$}, \@money, q{format.dollar.11} );
 }
 
 {
@@ -141,10 +162,11 @@ my @money =
   30.25 => q{+30.},
   1.792 => q{+1.},
   -3.003 => q{-3.},
+  1234.0078 => q{+1234.},
   1234.5678 => q{+1234.},
   );
 #$DEBUG = 1;
-test_formats( q{~0$}, \@money, q{format.dollar.11} );
+test_formats( q{~0$}, \@money, q{format.dollar.12} );
 }
 
 {
@@ -157,9 +179,11 @@ my @money =
   30.25 => q{+30.2500},
   1.792 => q{+1.7920},
   -3.003 => q{-3.0030},
+  1234.0078 => q{+1234.0078},
   1234.5678 => q{+1234.5678},
+  1234.567891 => q{+1234.5678},
   999.9999 => q{+999.9999},
   );
 #$DEBUG = 1;
-test_formats( q{~4$}, \@money, q{format.dollar.12} );
+test_formats( q{~4$}, \@money, q{format.dollar.13} );
 }

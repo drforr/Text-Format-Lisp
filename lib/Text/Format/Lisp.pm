@@ -11,6 +11,65 @@ our @EXPORT_OK = qw( Format );
 use version;
 our $VERSION = qv('0.0.3');
 
+=head1 NAME
+
+Text::Format::Lisp - Perl version of Common Lisp's (format) function
+
+
+=head1 VERSION
+
+This document describes Text::Format::Lisp version 0.0.3
+
+
+=head1 SYNOPSIS
+
+    use Text::Format::Lisp qw(Format);
+
+    Format(undef, "~a~%", "foo");
+    Format(undef, "~a: (~(~a => ~a~))", "names", %names);
+
+    
+=head1 DESCRIPTION
+
+=for author to fill in:
+    Write a full description of the module and its features here.
+    Use subsections (=head2, =head3) as appropriate.
+
+
+=head1 INTERFACE 
+
+=head2 Format_iterator($fh,$format,@params)
+
+Iterator-based tokenizing function. This will probably replace the original
+Format code when I get an idea of complex it has to be in order to handle the
+full CL tokens.
+
+=cut
+
+sub Format_iterator
+  {
+  my ( $fh, $format, @args ) = @_;
+
+  my @format = split //, $format;
+  my $pos = 0;
+  my $iterator =
+    {
+    eof => sub { $pos == $#format },
+    first => sub { $pos = 0; $format[$pos] },
+    next => sub { $pos++ if $pos < $#format; $format[$pos] },
+    peek => sub { my $_pos = $pos; $_pos++ if $_pos < $#format; $format[$_pos] },
+    prev => sub { $pos-- if $pos > 0; $format[$pos] },
+    last => sub { $pos = $#format; $format[$pos] },
+    };
+  my $token_iterator =
+    {
+    first =>
+      {
+      },
+    };
+  $iterator->{first}->();
+  }
+
 =head2 Format($fh,$format,@params)
 
 Does the nearest Perl equivalent of Lisp's (format) function. Along with some
@@ -245,45 +304,6 @@ else { $output = q{} }
   return $output;
   }
 
-1; # Magic true value required at end of module
-__END__
-
-=head1 NAME
-
-Text::Format::Lisp - [One line description of module's purpose here]
-
-
-=head1 VERSION
-
-This document describes Text::Format::Lisp version 0.0.1
-
-
-=head1 SYNOPSIS
-
-    use Text::Format::Lisp;
-
-=for author to fill in:
-    Brief code example(s) here showing commonest usage(s).
-    This section will be as far as many users bother reading
-    so make it as educational and exeplary as possible.
-  
-  
-=head1 DESCRIPTION
-
-=for author to fill in:
-    Write a full description of the module and its features here.
-    Use subsections (=head2, =head3) as appropriate.
-
-
-=head1 INTERFACE 
-
-=for author to fill in:
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
-
-
 =head1 DIAGNOSTICS
 
 =for author to fill in:
@@ -395,3 +415,5 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
+
+1;
